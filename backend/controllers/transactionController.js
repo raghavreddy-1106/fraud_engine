@@ -60,8 +60,40 @@ const getTransactionById = async (req, res) => {
     }
 };
 
+const updateTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, riskScore, riskLevel, reason } = req.body;
+
+        const result = await pool.query(
+            `UPDATE transactions
+             SET status = $1,
+                 risk_score = $2,
+                 risk_level = $3,
+                 reason = $4
+             WHERE id = $5
+             RETURNING *`,
+            [status, riskScore, riskLevel, reason, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "Transaction not found"
+            });
+        }
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to update transaction",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createTransaction,
     getTransactions,
-    getTransactionById
+    getTransactionById,
+    updateTransaction
 };
