@@ -3,3 +3,7 @@
 ml-service/paysim.csv
 ml-service/*.pkl
 .DS_Store
+
+# KYC uploaded documents and OCR data
+backend/uploads/
+backend/eng.traineddata

@@ -219,7 +219,7 @@ select:focus {
 
 table {
   width: 100%;
-  min-width: 1200px;
+  min-width: 1350px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -227,10 +227,10 @@ table {
 th,
 td {
   vertical-align: middle;
+  text-align: center;
 }
 
 th {
-  text-align: left;
   padding: 14px 10px;
   color: #64748b;
   font-size: 13px;
@@ -265,22 +265,22 @@ td:nth-child(2) {
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 9%;
+  width: 8%;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
-  width: 11%;
+  width: 10%;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
-  width: 13%;
+  width: 11%;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 11%;
+  width: 13%;
 }
 
 th:nth-child(7),
@@ -290,44 +290,88 @@ td:nth-child(7) {
 
 th:nth-child(8),
 td:nth-child(8) {
-  width: 26%;
+  width: 11%;
 }
 
-/* Badges */
+th:nth-child(9),
+td:nth-child(9) {
+  width: 17%;
+}
+
+/* Reason */
+
+.reason {
+  text-align: left;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Risk and status badges */
 
 .risk,
-.status {
-  display: inline-block;
+.status,
+.kyc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   padding: 6px 11px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.risk.low,
+/* Risk */
+
+.risk.low {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.risk.medium {
+  background: #fff8e1;
+  color: #9a6700;
+}
+
+.risk.high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Status */
+
 .status.approved {
   background: #e8f5e9;
   color: #2e7d32;
 }
 
-.risk.medium,
 .status.flagged {
   background: #fff8e1;
   color: #9a6700;
 }
 
-.risk.high,
 .status.blocked {
   background: #ffebee;
   color: #c62828;
 }
 
-.reason {
-  color: #64748b;
-  font-size: 13px;
-  line-height: 1.4;
-  word-break: break-word;
+/* KYC */
+
+.kyc.verified {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.kyc.pending {
+  background: #fff8e1;
+  color: #9a6700;
+}
+
+.kyc.rejected {
+  background: #ffebee;
+  color: #c62828;
 }
 
 /* Risk Overview */

@@ -21,6 +21,18 @@ const createTransaction = async (req, res) => {
             "SELECT COUNT(*) FROM transactions WHERE user_id = $1",
             [userId]
         );
+        const userResult = await pool.query(
+            "SELECT kyc_status FROM users WHERE id = $1",
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+    const kycStatus = userResult.rows[0].kyc_status;
 
         const transactionCount = Number(
             countResult.rows[0].count
@@ -33,7 +45,7 @@ const createTransaction = async (req, res) => {
                 amount,
                 hour: new Date().getHours(),
                 country: destinationCountry,
-                kycStatus: "VERIFIED",
+                kycStatus,
                 transactionCount
             }
         );
@@ -149,7 +161,10 @@ const createTransaction = async (req, res) => {
 const getTransactions = async (req, res) => {
     try {
         const result = await pool.query(
-            "SELECT * FROM transactions ORDER BY created_at DESC"
+            `SELECT t.*, u.kyc_status
+            FROM transactions t
+            JOIN users u ON t.user_id = u.id
+            ORDER BY t.created_at DESC`
         );
 
         res.json(result.rows);

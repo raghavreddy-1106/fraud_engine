@@ -8,6 +8,7 @@ const testRoutes = require("./routes/testRoutes");
 const pool = require("./config/db");
 const transactionRoutes = require("./routes/transactionRoutes");
 const riskRoutes = require("./routes/riskRoutes");
+const kycRoutes = require("./routes/kycRoutes");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", testRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/risk", riskRoutes);
+app.use("/api/kyc", kycRoutes);
 
 
 
