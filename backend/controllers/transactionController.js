@@ -1,18 +1,63 @@
+
+const axios = require("axios");
 const pool = require("../config/db");
 
 const createTransaction = async (req, res) => {
     try {
-        const { userId, amount, currency, destinationCountry } = req.body;
+        const {
+            userId,
+            amount,
+            currency,
+            destinationCountry
+        } = req.body;
+
+        const riskResponse = await axios.post(
+            "http://127.0.0.1:8000/risk-score",
+            {
+                amount,
+                hour: new Date().getHours(),
+                country: destinationCountry,
+                kycStatus: "VERIFIED",
+                transactionCount: 1
+            }
+        );
+
+        const {
+            riskScore,
+            riskLevel,
+            reason
+        } = riskResponse.data;
+
+        let status;
+
+        if (riskLevel === "HIGH") {
+            status = "BLOCKED";
+        } else if (riskLevel === "MEDIUM") {
+            status = "FLAGGED";
+        } else {
+            status = "APPROVED";
+        }
 
         const result = await pool.query(
             `INSERT INTO transactions
-            (user_id, amount, currency, destination_country)
-            VALUES ($1, $2, $3, $4)
+            (user_id, amount, currency, destination_country,
+             risk_score, risk_level, status, reason)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *`,
-            [userId, amount, currency, destinationCountry]
+            [
+                userId,
+                amount,
+                currency,
+                destinationCountry,
+                riskScore,
+                riskLevel,
+                status,
+                reason
+            ]
         );
 
         res.status(201).json(result.rows[0]);
+
     } catch (error) {
         res.status(500).json({
             message: "Failed to create transaction",
