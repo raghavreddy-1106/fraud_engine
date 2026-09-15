@@ -6,6 +6,12 @@ function TransactionForm() {
     amount: "",
     currency: "EUR",
     destinationCountry: "FR",
+    transactionType: "PAYMENT",
+    oldBalanceOrg: "",
+    newBalanceOrig: "",
+    oldBalanceDest: "",
+    newBalanceDest: "",
+    isFlaggedFraud: 0,
   });
 
   const [message, setMessage] = useState("");
@@ -32,9 +38,16 @@ function TransactionForm() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            ...form,
-            amount: Number(form.amount),
             userId: Number(form.userId),
+            amount: Number(form.amount),
+            currency: form.currency,
+            destinationCountry: form.destinationCountry,
+            transactionType: form.transactionType,
+            oldBalanceOrg: Number(form.oldBalanceOrg),
+            newBalanceOrig: Number(form.newBalanceOrig),
+            oldBalanceDest: Number(form.oldBalanceDest),
+            newBalanceDest: Number(form.newBalanceDest),
+            isFlaggedFraud: Number(form.isFlaggedFraud),
           }),
         }
       );
@@ -55,6 +68,12 @@ function TransactionForm() {
         amount: "",
         currency: "EUR",
         destinationCountry: "FR",
+        transactionType: "PAYMENT",
+        oldBalanceOrg: "",
+        newBalanceOrig: "",
+        oldBalanceDest: "",
+        newBalanceDest: "",
+        isFlaggedFraud: 0,
       });
 
       setTimeout(() => {
@@ -70,11 +89,13 @@ function TransactionForm() {
   return (
     <div className="form-card">
       <h2>Create Transaction</h2>
+
       <p className="form-subtitle">
         Enter transaction details to evaluate fraud risk in real time.
       </p>
 
       <form onSubmit={handleSubmit}>
+
         <div className="field">
           <label>Transaction Amount</label>
           <input
@@ -115,10 +136,84 @@ function TransactionForm() {
           </select>
         </div>
 
-        <button type="submit">Check Transaction</button>
+        <div className="field">
+          <label>Transaction Type</label>
+          <select
+            name="transactionType"
+            value={form.transactionType}
+            onChange={handleChange}
+          >
+            <option value="PAYMENT">PAYMENT</option>
+            <option value="TRANSFER">TRANSFER</option>
+            <option value="CASH_OUT">CASH OUT</option>
+            <option value="CASH_IN">CASH IN</option>
+            <option value="DEBIT">DEBIT</option>
+          </select>
+        </div>
+
+        <div className="field">
+          <label>Old Balance (Sender)</label>
+          <input
+            type="number"
+            name="oldBalanceOrg"
+            placeholder="0"
+            value={form.oldBalanceOrg}
+            onChange={handleChange}
+            min="0"
+            required
+          />
+        </div>
+
+        <div className="field">
+          <label>New Balance (Sender)</label>
+          <input
+            type="number"
+            name="newBalanceOrig"
+            placeholder="0"
+            value={form.newBalanceOrig}
+            onChange={handleChange}
+            min="0"
+            required
+          />
+        </div>
+
+        <div className="field">
+          <label>Old Balance (Receiver)</label>
+          <input
+            type="number"
+            name="oldBalanceDest"
+            placeholder="0"
+            value={form.oldBalanceDest}
+            onChange={handleChange}
+            min="0"
+            required
+          />
+        </div>
+
+        <div className="field">
+          <label>New Balance (Receiver)</label>
+          <input
+            type="number"
+            name="newBalanceDest"
+            placeholder="0"
+            value={form.newBalanceDest}
+            onChange={handleChange}
+            min="0"
+            required
+          />
+        </div>
+
+        <button type="submit">
+          Check Transaction
+        </button>
+
       </form>
 
-      {message && <p className="transaction-message">{message}</p>}
+      {message && (
+        <p className="transaction-message">
+          {message}
+        </p>
+      )}
     </div>
   );
 }

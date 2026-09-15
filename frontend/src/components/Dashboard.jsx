@@ -2,18 +2,44 @@ import { useEffect, useState } from "react";
 
 function Dashboard() {
   const [transactions, setTransactions] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    if (!token) {
+      setError("Please login again.");
+      return;
+    }
 
     fetch("http://localhost:3000/api/transactions", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((response) => response.json())
-      .then((data) => setTransactions(data))
-      .catch((error) => console.error(error));
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load transactions");
+        }
+
+        return data;
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTransactions(data);
+          setError("");
+        } else {
+          setTransactions([]);
+          setError("Invalid transaction data received.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setTransactions([]);
+        setError(err.message);
+      });
   }, []);
 
   const approved = transactions.filter(
@@ -42,7 +68,12 @@ function Dashboard() {
 
   return (
     <>
-      {/* Summary Cards */}
+      {error && (
+        <div className="transaction-message">
+          {error}
+        </div>
+      )}
+
       <div className="dashboard">
         <div className="card total-card">
           <h3>Total Transactions</h3>
@@ -65,7 +96,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Risk Overview */}
       <div className="table-card risk-overview">
         <h2>Risk Overview</h2>
 
@@ -90,7 +120,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Transactions Table */}
       <div className="table-card">
         <h2>Recent Transactions</h2>
 
@@ -101,6 +130,7 @@ function Dashboard() {
               <th>Amount</th>
               <th>Country</th>
               <th>Risk Score</th>
+              <th>ML Probability</th>
               <th>Risk</th>
               <th>Status</th>
               <th>Reason</th>
@@ -119,6 +149,10 @@ function Dashboard() {
                 <td>{transaction.destination_country}</td>
 
                 <td>{transaction.risk_score}</td>
+
+                <td>
+                    {Number(transaction.ml_fraud_probability || 0).toFixed(2)}%
+                </td>
 
                 <td>
                   <span

@@ -1,4 +1,3 @@
-
 const axios = require("axios");
 const pool = require("../config/db");
 
@@ -8,17 +7,26 @@ const createTransaction = async (req, res) => {
             userId,
             amount,
             currency,
-            destinationCountry
+            destinationCountry,
+            transactionType,
+            oldBalanceOrg,
+            newBalanceOrig,
+            oldBalanceDest,
+            newBalanceDest,
+            isFlaggedFraud
         } = req.body;
 
-        // Get actual transaction history for the user
+        // Get transaction history
         const countResult = await pool.query(
             "SELECT COUNT(*) FROM transactions WHERE user_id = $1",
             [userId]
         );
 
-        const transactionCount = Number(countResult.rows[0].count);
+        const transactionCount = Number(
+            countResult.rows[0].count
+        );
 
+        // Rule-based risk
         const riskResponse = await axios.post(
             "http://127.0.0.1:8000/risk-score",
             {
@@ -30,49 +38,113 @@ const createTransaction = async (req, res) => {
             }
         );
 
-        const {
-            riskScore,
-            riskLevel,
-            reason
-        } = riskResponse.data;
+        const ruleRisk = riskResponse.data;
+
+        // ML-based risk
+        const mlResponse = await axios.post(
+            "http://127.0.0.1:8000/ml-risk-paysim",
+            {
+                step: 1,
+                type: transactionType,
+                amount,
+                oldbalanceOrg: oldBalanceOrg,
+                newbalanceOrig: newBalanceOrig,
+                oldbalanceDest: oldBalanceDest,
+                newbalanceDest: newBalanceDest,
+                isFlaggedFraud: isFlaggedFraud
+            }
+        );
+
+        const mlRisk = mlResponse.data;
+        const mlFraudProbability = mlRisk.fraudProbability;
+
+        // Combine rule + ML decisions
+        let finalRiskLevel = ruleRisk.riskLevel;
+        let finalScore = ruleRisk.riskScore;
+        let finalReason = ruleRisk.reason;
+
+        if (mlRisk.riskLevel === "HIGH") {
+            finalRiskLevel = "HIGH";
+            finalScore = Math.max(finalScore, 70);
+            finalReason += " + " + mlRisk.reason;
+        } else if (
+            mlRisk.riskLevel === "MEDIUM" &&
+            finalRiskLevel === "LOW"
+        ) {
+            finalRiskLevel = "MEDIUM";
+            finalScore = Math.max(finalScore, 40);
+            finalReason += " + " + mlRisk.reason;
+        }
 
         let status;
 
-        if (riskLevel === "HIGH") {
+        if (finalRiskLevel === "HIGH") {
             status = "BLOCKED";
-        } else if (riskLevel === "MEDIUM") {
+        } else if (finalRiskLevel === "MEDIUM") {
             status = "FLAGGED";
         } else {
             status = "APPROVED";
         }
 
+        // Save transaction
         const result = await pool.query(
             `INSERT INTO transactions
-            (user_id, amount, currency, destination_country,
-             risk_score, risk_level, status, reason)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            (
+                user_id,
+                amount,
+                currency,
+                destination_country,
+                transaction_type,
+                old_balance_org,
+                new_balance_orig,
+                old_balance_dest,
+                new_balance_dest,
+                ml_fraud_probability,
+                risk_score,
+                risk_level,
+                status,
+                reason
+            )
+            VALUES
+            (
+                $1, $2, $3, $4, $5,
+                $6, $7, $8, $9, $10,
+                $11, $12, $13, $14
+            )
             RETURNING *`,
             [
                 userId,
                 amount,
                 currency,
                 destinationCountry,
-                riskScore,
-                riskLevel,
+                transactionType,
+                oldBalanceOrg,
+                newBalanceOrig,
+                oldBalanceDest,
+                newBalanceDest,
+                mlFraudProbability,
+                finalScore,
+                finalRiskLevel,
                 status,
-                reason
+                finalReason
             ]
         );
 
-        res.status(201).json(result.rows[0]);
+        res.status(201).json({
+            ...result.rows[0],
+            mlRisk: mlRisk
+        });
 
     } catch (error) {
+        console.error("Create transaction error:", error);
+
         res.status(500).json({
             message: "Failed to create transaction",
             error: error.message
         });
     }
 };
+
 
 const getTransactions = async (req, res) => {
     try {
@@ -81,6 +153,7 @@ const getTransactions = async (req, res) => {
         );
 
         res.json(result.rows);
+
     } catch (error) {
         res.status(500).json({
             message: "Failed to fetch transactions",
@@ -88,6 +161,7 @@ const getTransactions = async (req, res) => {
         });
     }
 };
+
 
 const getTransactionById = async (req, res) => {
     try {
@@ -105,6 +179,7 @@ const getTransactionById = async (req, res) => {
         }
 
         res.json(result.rows[0]);
+
     } catch (error) {
         res.status(500).json({
             message: "Failed to fetch transaction",
@@ -113,10 +188,17 @@ const getTransactionById = async (req, res) => {
     }
 };
 
+
 const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, riskScore, riskLevel, reason } = req.body;
+
+        const {
+            status,
+            riskScore,
+            riskLevel,
+            reason
+        } = req.body;
 
         const result = await pool.query(
             `UPDATE transactions
@@ -126,7 +208,13 @@ const updateTransaction = async (req, res) => {
                  reason = $4
              WHERE id = $5
              RETURNING *`,
-            [status, riskScore, riskLevel, reason, id]
+            [
+                status,
+                riskScore,
+                riskLevel,
+                reason,
+                id
+            ]
         );
 
         if (result.rows.length === 0) {
@@ -136,6 +224,7 @@ const updateTransaction = async (req, res) => {
         }
 
         res.json(result.rows[0]);
+
     } catch (error) {
         res.status(500).json({
             message: "Failed to update transaction",
@@ -143,6 +232,7 @@ const updateTransaction = async (req, res) => {
         });
     }
 };
+
 
 const deleteTransaction = async (req, res) => {
     try {
@@ -163,6 +253,7 @@ const deleteTransaction = async (req, res) => {
             message: "Transaction deleted successfully",
             transaction: result.rows[0]
         });
+
     } catch (error) {
         res.status(500).json({
             message: "Failed to delete transaction",
@@ -170,6 +261,7 @@ const deleteTransaction = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     createTransaction,

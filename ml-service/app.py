@@ -1,8 +1,29 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import pandas as pd
+import joblib
+from pathlib import Path
 
 app = FastAPI()
 
+# =========================================================
+# LOAD PAYSIM ML MODEL
+# =========================================================
+
+BASE_DIR = Path(__file__).resolve().parent
+
+paysim_model = joblib.load(
+    BASE_DIR / "paysim_fraud_model.pkl"
+)
+
+paysim_preprocessor = joblib.load(
+    BASE_DIR / "paysim_preprocessor.pkl"
+)
+
+
+# =========================================================
+# RULE-BASED RISK REQUEST
+# =========================================================
 
 class RiskRequest(BaseModel):
     amount: float
@@ -11,6 +32,25 @@ class RiskRequest(BaseModel):
     kycStatus: str
     transactionCount: int
 
+
+# =========================================================
+# PAYSIM ML REQUEST
+# =========================================================
+
+class PaySimRiskRequest(BaseModel):
+    step: int
+    type: str
+    amount: float
+    oldbalanceOrg: float
+    newbalanceOrig: float
+    oldbalanceDest: float
+    newbalanceDest: float
+    isFlaggedFraud: int
+
+
+# =========================================================
+# RULE-BASED RISK ENGINE
+# =========================================================
 
 @app.post("/risk-score")
 def risk_score(data: RiskRequest):
@@ -21,6 +61,7 @@ def risk_score(data: RiskRequest):
     if data.amount >= 100000:
         score += 50
         reasons.append("Very high transaction amount")
+
     elif data.amount > 30000:
         score += 30
         reasons.append("High transaction amount")
@@ -49,5 +90,62 @@ def risk_score(data: RiskRequest):
     return {
         "riskScore": score,
         "riskLevel": level,
-        "reason": " + ".join(reasons) if reasons else "Normal transaction"
+        "reason": " + ".join(reasons)
+        if reasons
+        else "Normal transaction"
+    }
+
+
+# =========================================================
+# PAYSIM ML RISK ENGINE
+# =========================================================
+
+@app.post("/ml-risk-paysim")
+def ml_risk_paysim(data: PaySimRiskRequest):
+
+    values = data.model_dump()
+
+    df = pd.DataFrame([values])
+
+    # Apply same preprocessing used during training
+    df = paysim_preprocessor.transform(df)
+
+    prediction = int(
+        paysim_model.predict(df)[0]
+    )
+
+    probability = float(
+        paysim_model.predict_proba(df)[0][1]
+    )
+
+    if probability >= 0.70:
+        risk_level = "HIGH"
+        reason = "ML model detected high fraud probability"
+
+    elif probability >= 0.30:
+        risk_level = "MEDIUM"
+        reason = "ML model detected elevated fraud probability"
+
+    else:
+        risk_level = "LOW"
+        reason = "ML model indicates normal transaction behavior"
+
+    return {
+        "fraudPrediction": prediction,
+        "fraudProbability": round(probability * 100, 2),
+        "riskLevel": risk_level,
+        "reason": reason
+    }
+
+
+# =========================================================
+# HEALTH CHECK
+# =========================================================
+
+@app.get("/health")
+def health():
+
+    return {
+        "status": "OK",
+        "paysimModelLoaded": True
     }
