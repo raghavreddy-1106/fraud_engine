@@ -91,9 +91,37 @@ const updateTransaction = async (req, res) => {
     }
 };
 
+const deleteTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await pool.query(
+            "DELETE FROM transactions WHERE id = $1 RETURNING *",
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "Transaction not found"
+            });
+        }
+
+        res.json({
+            message: "Transaction deleted successfully",
+            transaction: result.rows[0]
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to delete transaction",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createTransaction,
     getTransactions,
     getTransactionById,
-    updateTransaction
+    updateTransaction,
+    deleteTransaction
 };
