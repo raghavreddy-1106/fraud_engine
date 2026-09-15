@@ -12,30 +12,36 @@ function Dashboard() {
 
   return (
     <>
-      <div className="dashboard">
-        <div className="card">
-          <h3>Total Transactions</h3>
-          <p>{transactions.length}</p>
+        <div className="dashboard">
+            <div className="card total-card">
+                <h3>Total Transactions</h3>
+                <p>{transactions.length}</p>
+            </div>
+
+            <div className="card approved-card">
+                <h3>Approved</h3>
+                <p>
+                    {transactions.filter((t) => t.status === "APPROVED").length}
+                </p>
+            </div>
+
+            <div className="card flagged-card">
+                <h3>Flagged</h3>
+                <p>
+                    {transactions.filter((t) => t.status === "FLAGGED").length}
+                </p>
+            </div>
+
+            <div className="card blocked-card">
+                <h3>Blocked</h3>
+                <p>
+                    {transactions.filter((t) => t.status === "BLOCKED").length}
+                </p>
+            </div>
         </div>
 
-        <div className="card">
-          <h3>Approved</h3>
-          <p>{transactions.filter(t => t.status === "APPROVED").length}</p>
-        </div>
-
-        <div className="card">
-          <h3>Flagged</h3>
-          <p>{transactions.filter(t => t.status === "FLAGGED").length}</p>
-        </div>
-
-        <div className="card">
-          <h3>Blocked</h3>
-          <p>{transactions.filter(t => t.status === "BLOCKED").length}</p>
-        </div>
-      </div>
-
-      <div className="table-card">
-        <h2>Recent Transactions</h2>
+        <div className="table-card">
+            <h2>Recent Transactions</h2>
 
         <table>
           <thead>
@@ -46,6 +52,7 @@ function Dashboard() {
               <th>Risk Score</th>
               <th>Risk</th>
               <th>Status</th>
+              <th>Reason</th>
             </tr>
           </thead>
 
@@ -68,6 +75,10 @@ function Dashboard() {
                     <span className={`status ${transaction.status.toLowerCase()}`}>
                         {transaction.status}
                     </span>
+                </td>
+
+                <td className="reason">
+                    {transaction.reason || "Normal transaction"}
                 </td>
               </tr>
             ))}
