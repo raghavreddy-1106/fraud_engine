@@ -6,6 +6,8 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const testRoutes = require("./routes/testRoutes");
 const pool = require("./config/db");
+const transactionRoutes = require("./routes/transactionRoutes");
+
 
 const app = express();
 
@@ -14,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api", testRoutes);
+app.use("/api/transactions", transactionRoutes);
 
 
 
@@ -33,6 +36,7 @@ pool.query("SELECT NOW()", (err, result) => {
         console.log("Database connected:", result.rows[0]);
     }
 });
+
 app.listen(PORT, () => {
     console.log(`Backend running on port ${PORT}`);
 });
