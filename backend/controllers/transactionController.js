@@ -11,6 +11,14 @@ const createTransaction = async (req, res) => {
             destinationCountry
         } = req.body;
 
+        // Get actual transaction history for the user
+        const countResult = await pool.query(
+            "SELECT COUNT(*) FROM transactions WHERE user_id = $1",
+            [userId]
+        );
+
+        const transactionCount = Number(countResult.rows[0].count);
+
         const riskResponse = await axios.post(
             "http://127.0.0.1:8000/risk-score",
             {
@@ -18,7 +26,7 @@ const createTransaction = async (req, res) => {
                 hour: new Date().getHours(),
                 country: destinationCountry,
                 kycStatus: "VERIFIED",
-                transactionCount: 1
+                transactionCount
             }
         );
 
