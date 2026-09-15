@@ -7,7 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const testRoutes = require("./routes/testRoutes");
 const pool = require("./config/db");
 const transactionRoutes = require("./routes/transactionRoutes");
-
+const riskRoutes = require("./routes/riskRoutes");
 
 const app = express();
 
@@ -17,6 +17,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api", testRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/risk", riskRoutes);
 
 
 
