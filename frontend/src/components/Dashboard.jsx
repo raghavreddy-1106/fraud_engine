@@ -4,11 +4,17 @@ function Dashboard() {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/transactions")
-      .then((response) => response.json())
-      .then((data) => setTransactions(data))
-      .catch((error) => console.error(error));
-  }, []);
+  const token = localStorage.getItem("token");
+
+  fetch("http://localhost:3000/api/transactions", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => setTransactions(data))
+    .catch((error) => console.error(error));
+}, []);
 
   return (
     <>

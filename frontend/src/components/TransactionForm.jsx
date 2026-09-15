@@ -21,12 +21,15 @@ function TransactionForm() {
     e.preventDefault();
 
     try {
+      const token = localStorage.getItem("token");
+
       const response = await fetch(
         "http://localhost:3000/api/transactions",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             ...form,
@@ -37,6 +40,11 @@ function TransactionForm() {
       );
 
       const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Transaction failed");
+        return;
+      }
 
       setMessage(
         `${data.status} - Risk: ${data.risk_level} (${data.risk_score})`
