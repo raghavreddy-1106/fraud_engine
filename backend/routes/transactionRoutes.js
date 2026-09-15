@@ -1,4 +1,5 @@
 const express = require("express");
+const authenticate = require("../middleware/authMiddleware");
 
 const {
     createTransaction,
@@ -10,10 +11,10 @@ const {
 
 const router = express.Router();
 
-router.post("/", createTransaction);
-router.get("/", getTransactions);
-router.get("/:id", getTransactionById);
-router.put("/:id", updateTransaction);
-router.delete("/:id", deleteTransaction);
+router.post("/", authenticate, createTransaction);
+router.get("/", authenticate, getTransactions);
+router.get("/:id", authenticate, getTransactionById);
+router.put("/:id", authenticate, updateTransaction);
+router.delete("/:id", authenticate, deleteTransaction);
 
 module.exports = router;
