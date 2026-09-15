@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./components/Login";
 import TransactionForm from "./components/TransactionForm";
 import Dashboard from "./components/Dashboard";
+import KYCVerification from "./components/KYCVerification";
 import "./App.css";
 
 function App() {
@@ -29,7 +30,10 @@ function App() {
         <>
           <button onClick={handleLogout}>Logout</button>
 
+          <KYCVerification />
+
           <TransactionForm />
+
           <Dashboard />
         </>
       )}
