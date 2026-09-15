@@ -18,7 +18,10 @@ def risk_score(data: RiskRequest):
     score = 0
     reasons = []
 
-    if data.amount > 30000:
+    if data.amount >= 100000:
+        score += 50
+        reasons.append("Very high transaction amount")
+    elif data.amount > 30000:
         score += 30
         reasons.append("High transaction amount")
 
