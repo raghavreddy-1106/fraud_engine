@@ -50,14 +50,17 @@ function TransactionForm() {
         `${data.status} - Risk: ${data.risk_level} (${data.risk_score})`
       );
 
-      window.location.reload();
-
       setForm({
         userId: 1,
         amount: "",
         currency: "EUR",
         destinationCountry: "FR",
       });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 800);
+
     } catch (error) {
       setMessage("Transaction failed");
       console.error(error);
@@ -67,42 +70,55 @@ function TransactionForm() {
   return (
     <div className="form-card">
       <h2>Create Transaction</h2>
+      <p className="form-subtitle">
+        Enter transaction details to evaluate fraud risk in real time.
+      </p>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          value={form.amount}
-          onChange={handleChange}
-          required
-        />
+        <div className="field">
+          <label>Transaction Amount</label>
+          <input
+            type="number"
+            name="amount"
+            placeholder="Enter amount"
+            value={form.amount}
+            onChange={handleChange}
+            required
+            min="1"
+          />
+        </div>
 
-        <select
-          name="currency"
-          value={form.currency}
-          onChange={handleChange}
-        >
-          <option value="EUR">EUR</option>
-          <option value="USD">USD</option>
-          <option value="INR">INR</option>
-        </select>
+        <div className="field">
+          <label>Currency</label>
+          <select
+            name="currency"
+            value={form.currency}
+            onChange={handleChange}
+          >
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="INR">INR</option>
+          </select>
+        </div>
 
-        <select
-          name="destinationCountry"
-          value={form.destinationCountry}
-          onChange={handleChange}
-        >
-          <option value="FR">France</option>
-          <option value="DE">Germany</option>
-          <option value="US">USA</option>
-          <option value="IN">India</option>
-        </select>
+        <div className="field">
+          <label>Destination Country</label>
+          <select
+            name="destinationCountry"
+            value={form.destinationCountry}
+            onChange={handleChange}
+          >
+            <option value="FR">France</option>
+            <option value="DE">Germany</option>
+            <option value="US">USA</option>
+            <option value="IN">India</option>
+          </select>
+        </div>
 
         <button type="submit">Check Transaction</button>
       </form>
 
-      {message && <p>{message}</p>}
+      {message && <p className="transaction-message">{message}</p>}
     </div>
   );
 }
