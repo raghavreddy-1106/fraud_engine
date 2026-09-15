@@ -22,7 +22,7 @@ function App() {
   return (
     <div className="app">
       <h1>Real-Time Risk & Fraud Engine</h1>
-      <p>BNP Cross-Border Transaction Monitoring</p>
+      <p>Cross-Border Transaction Monitoring</p>
 
       {!loggedIn ? (
         <Login onLogin={handleLogin} />

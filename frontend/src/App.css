@@ -34,8 +34,6 @@ body {
   font-size: 18px;
 }
 
-/* Buttons */
-
 button {
   border: none;
   border-radius: 6px;
@@ -85,16 +83,6 @@ button:hover {
   color: #12355b;
 }
 
-/* Form */
-
-.form-card form {
-  display: flex;
-  gap: 14px;
-  align-items: flex-end;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
 .form-subtitle {
   margin-top: -10px;
   margin-bottom: 22px;
@@ -102,24 +90,18 @@ button:hover {
   font-size: 14px;
 }
 
+/* General fields */
+
 .field {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  flex: 1 1 180px;
 }
 
 .field label {
   font-size: 13px;
   font-weight: 600;
   color: #475569;
-}
-
-.form-card form button {
-  height: 42px;
-  min-width: 165px;
-  align-self: flex-end;
-  white-space: nowrap;
 }
 
 input,
@@ -141,12 +123,6 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(18, 53, 91, 0.08);
 }
 
-.form-card p {
-  margin-bottom: 0;
-  color: #475569;
-  font-weight: 600;
-}
-
 .transaction-message {
   margin-top: 18px;
   padding: 12px 14px;
@@ -155,7 +131,96 @@ select:focus {
   color: #12355b;
 }
 
-/* Dashboard */
+/* =========================
+   KYC
+========================= */
+
+.kyc-card {
+  margin-bottom: 30px;
+}
+
+.kyc-form {
+  display: grid;
+  grid-template-columns: 220px 1fr 165px;
+  gap: 20px;
+  width: 100%;
+  align-items: end;
+}
+
+.kyc-form .field {
+  width: 100%;
+}
+
+.file-input {
+  width: 100%;
+  height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: white;
+  color: #334155;
+  font-size: 13px;
+}
+
+.kyc-button {
+  width: 165px;
+  height: 42px;
+}
+
+.kyc-result {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.kyc-result.verified {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.kyc-result.pending {
+  background: #fff8e1;
+  color: #9a6700;
+}
+
+.kyc-result.rejected {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* =========================
+   TRANSACTION FORM
+========================= */
+
+.transaction-card {
+  margin-bottom: 30px;
+}
+
+.transaction-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+  align-items: end;
+}
+
+.transaction-form .field {
+  width: 100%;
+}
+
+/* Center Check Transaction button */
+
+.transaction-button {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 220px;
+  height: 42px;
+}
+
+/* =========================
+   DASHBOARD SUMMARY
+========================= */
 
 .dashboard {
   width: 100%;
@@ -206,7 +271,9 @@ select:focus {
   background: #fff9f9;
 }
 
-/* Table */
+/* =========================
+   TABLE
+========================= */
 
 .table-card {
   padding: 28px;
@@ -219,7 +286,7 @@ select:focus {
 
 table {
   width: 100%;
-  min-width: 1350px;
+  min-width: 1100px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -251,7 +318,7 @@ tbody tr:hover {
   background: #f8fafc;
 }
 
-/* Transaction column widths */
+/* 8 transaction columns */
 
 th:nth-child(1),
 td:nth-child(1) {
@@ -260,45 +327,38 @@ td:nth-child(1) {
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 13%;
+  width: 14%;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 8%;
+  width: 10%;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
-  width: 10%;
+  width: 12%;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
-  width: 11%;
+  width: 12%;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 13%;
+  width: 12%;
 }
 
 th:nth-child(7),
 td:nth-child(7) {
-  width: 11%;
+  width: 12%;
 }
 
 th:nth-child(8),
 td:nth-child(8) {
-  width: 11%;
+  width: 22%;
 }
-
-th:nth-child(9),
-td:nth-child(9) {
-  width: 17%;
-}
-
-/* Reason */
 
 .reason {
   text-align: left;
@@ -308,7 +368,9 @@ td:nth-child(9) {
   word-break: break-word;
 }
 
-/* Risk and status badges */
+/* =========================
+   BADGES
+========================= */
 
 .risk,
 .status,
@@ -323,58 +385,30 @@ td:nth-child(9) {
   font-weight: 700;
 }
 
-/* Risk */
-
-.risk.low {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.risk.medium {
-  background: #fff8e1;
-  color: #9a6700;
-}
-
-.risk.high {
-  background: #ffebee;
-  color: #c62828;
-}
-
-/* Status */
-
-.status.approved {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status.flagged {
-  background: #fff8e1;
-  color: #9a6700;
-}
-
-.status.blocked {
-  background: #ffebee;
-  color: #c62828;
-}
-
-/* KYC */
-
+.risk.low,
+.status.approved,
 .kyc.verified {
   background: #e8f5e9;
   color: #2e7d32;
 }
 
+.risk.medium,
+.status.flagged,
 .kyc.pending {
   background: #fff8e1;
   color: #9a6700;
 }
 
+.risk.high,
+.status.blocked,
 .kyc.rejected {
   background: #ffebee;
   color: #c62828;
 }
 
-/* Risk Overview */
+/* =========================
+   RISK OVERVIEW
+========================= */
 
 .risk-overview {
   margin-bottom: 30px;
@@ -441,33 +475,35 @@ td:nth-child(9) {
   color: #c62828;
 }
 
-/* Tablet */
+/* =========================
+   RESPONSIVE
+========================= */
 
-@media (max-width: 1200px) {
-  .app {
-    padding: 40px 30px 50px;
+@media (max-width: 1100px) {
+  .transaction-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .transaction-button {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 220px;
+  }
+
+  .kyc-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .kyc-button {
+    width: 100%;
   }
 
   .dashboard {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .form-card form {
-    flex-wrap: wrap;
-  }
-
-  .field {
-    flex: 1 1 220px;
-  }
-
-  .form-card form button {
-    flex: 0 0 165px;
-  }
 }
 
-/* Mobile */
-
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   .app {
     padding: 25px 15px 40px;
   }
@@ -480,21 +516,25 @@ td:nth-child(9) {
     font-size: 15px;
   }
 
-  .dashboard {
+  .transaction-form {
     grid-template-columns: 1fr;
   }
 
-  .form-card form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .field {
+  .transaction-button {
+    grid-column: 1;
     width: 100%;
   }
 
-  .form-card form button {
+  .kyc-form {
+    grid-template-columns: 1fr;
+  }
+
+  .kyc-button {
     width: 100%;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
   }
 
   .risk-overview-grid {
@@ -504,4 +544,22 @@ td:nth-child(9) {
   .table-card {
     padding: 18px;
   }
+}
+/* Login form spacing */
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-card input {
+  width: 100%;
+  height: 44px;
+}
+
+.login-card button {
+  margin-top: 4px;
+  align-self: center;
+  min-width: 100px;
 }

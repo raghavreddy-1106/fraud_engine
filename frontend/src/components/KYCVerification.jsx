@@ -42,6 +42,7 @@ function KYCVerification() {
 
       setStatus(data.kyc?.kyc_status || "PENDING");
       setMessage(data.message || "KYC processed successfully");
+
     } catch (error) {
       console.error(error);
       setMessage("Backend unavailable");
@@ -49,14 +50,15 @@ function KYCVerification() {
   };
 
   return (
-    <div className="form-card">
+    <div className="form-card kyc-card">
       <h2>KYC Verification</h2>
 
       <p className="form-subtitle">
         Upload an identity document for verification.
       </p>
 
-      <form onSubmit={handleSubmit}>
+      <form className="kyc-form" onSubmit={handleSubmit}>
+
         <div className="field">
           <label>Document Type</label>
 
@@ -74,6 +76,7 @@ function KYCVerification() {
           <label>Identity Document</label>
 
           <input
+            className="file-input"
             type="file"
             accept=".jpg,.jpeg,.png,.pdf"
             onChange={(e) => setDocument(e.target.files[0])}
@@ -81,9 +84,10 @@ function KYCVerification() {
           />
         </div>
 
-        <button type="submit">
+        <button type="submit" className="kyc-button">
           Verify KYC
         </button>
+
       </form>
 
       {message && (
@@ -93,9 +97,9 @@ function KYCVerification() {
       )}
 
       {status && (
-        <p className={`kyc-result ${status.toLowerCase()}`}>
-          KYC Status: {status}
-        </p>
+        <div className={`kyc-result ${status.toLowerCase()}`}>
+          KYC Status: <strong>{status}</strong>
+        </div>
       )}
     </div>
   );

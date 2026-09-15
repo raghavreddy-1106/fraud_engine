@@ -63,38 +63,25 @@ function TransactionForm() {
         `${data.status} - Risk: ${data.risk_level} (${data.risk_score})`
       );
 
-      setForm({
-        userId: 1,
-        amount: "",
-        currency: "EUR",
-        destinationCountry: "FR",
-        transactionType: "PAYMENT",
-        oldBalanceOrg: "",
-        newBalanceOrig: "",
-        oldBalanceDest: "",
-        newBalanceDest: "",
-        isFlaggedFraud: 0,
-      });
-
       setTimeout(() => {
         window.location.reload();
       }, 800);
 
     } catch (error) {
-      setMessage("Transaction failed");
       console.error(error);
+      setMessage("Transaction failed");
     }
   };
 
   return (
-    <div className="form-card">
+    <div className="form-card transaction-card">
       <h2>Create Transaction</h2>
 
       <p className="form-subtitle">
         Enter transaction details to evaluate fraud risk in real time.
       </p>
 
-      <form onSubmit={handleSubmit}>
+      <form className="transaction-form" onSubmit={handleSubmit}>
 
         <div className="field">
           <label>Transaction Amount</label>
@@ -104,8 +91,8 @@ function TransactionForm() {
             placeholder="Enter amount"
             value={form.amount}
             onChange={handleChange}
-            required
             min="1"
+            required
           />
         </div>
 
@@ -203,7 +190,7 @@ function TransactionForm() {
           />
         </div>
 
-        <button type="submit">
+        <button type="submit" className="transaction-button">
           Check Transaction
         </button>
 

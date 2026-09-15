@@ -131,7 +131,6 @@ function Dashboard() {
               <th>Country</th>
               <th>KYC</th>
               <th>Risk Score</th>
-              <th>ML Probability</th>
               <th>Risk</th>
               <th>Status</th>
               <th>Reason</th>
@@ -162,13 +161,6 @@ function Dashboard() {
                 </td>
 
                 <td>{transaction.risk_score}</td>
-
-                <td>
-                  {Number(
-                    transaction.ml_fraud_probability || 0
-                  ).toFixed(2)}
-                  %
-                </td>
 
                 <td>
                   <span
