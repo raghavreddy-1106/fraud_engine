@@ -1,10 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function KYCVerification() {
   const [documentType, setDocumentType] = useState("PAN");
   const [document, setDocument] = useState(null);
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("PENDING");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    fetch("http://localhost:3000/api/kyc/status/1", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load KYC status");
+        }
+
+        return data;
+      })
+      .then((data) => {
+        setStatus(data.kyc_status || "PENDING");
+
+        if (data.kyc_document_type) {
+          setDocumentType(data.kyc_document_type);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,6 +48,7 @@ function KYCVerification() {
     const token = localStorage.getItem("token");
 
     const formData = new FormData();
+
     formData.append("userId", "1");
     formData.append("documentType", documentType);
     formData.append("document", document);
@@ -96,11 +128,9 @@ function KYCVerification() {
         </p>
       )}
 
-      {status && (
-        <div className={`kyc-result ${status.toLowerCase()}`}>
-          KYC Status: <strong>{status}</strong>
-        </div>
-      )}
+      <div className={`kyc-result ${status.toLowerCase()}`}>
+        KYC Status: <strong>{status}</strong>
+      </div>
     </div>
   );
 }

@@ -21,6 +21,12 @@ const createTransaction = async (req, res) => {
             "SELECT COUNT(*) FROM transactions WHERE user_id = $1",
             [userId]
         );
+
+        const transactionCount = Number(
+            countResult.rows[0].count
+        );
+
+        // Get current KYC status
         const userResult = await pool.query(
             "SELECT kyc_status FROM users WHERE id = $1",
             [userId]
@@ -32,11 +38,7 @@ const createTransaction = async (req, res) => {
             });
         }
 
-    const kycStatus = userResult.rows[0].kyc_status;
-
-        const transactionCount = Number(
-            countResult.rows[0].count
-        );
+        const kycStatus = userResult.rows[0].kyc_status;
 
         // Rule-based risk
         const riskResponse = await axios.post(
@@ -70,7 +72,7 @@ const createTransaction = async (req, res) => {
         const mlRisk = mlResponse.data;
         const mlFraudProbability = mlRisk.fraudProbability;
 
-        // Combine rule + ML decisions
+        // Combine rule + ML
         let finalRiskLevel = ruleRisk.riskLevel;
         let finalScore = ruleRisk.riskScore;
         let finalReason = ruleRisk.reason;
@@ -98,7 +100,7 @@ const createTransaction = async (req, res) => {
             status = "APPROVED";
         }
 
-        // Save transaction
+        // Save transaction with KYC snapshot
         const result = await pool.query(
             `INSERT INTO transactions
             (
@@ -111,6 +113,7 @@ const createTransaction = async (req, res) => {
                 new_balance_orig,
                 old_balance_dest,
                 new_balance_dest,
+                transaction_kyc_status,
                 ml_fraud_probability,
                 risk_score,
                 risk_level,
@@ -121,7 +124,7 @@ const createTransaction = async (req, res) => {
             (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9, $10,
-                $11, $12, $13, $14
+                $11, $12, $13, $14, $15
             )
             RETURNING *`,
             [
@@ -134,6 +137,7 @@ const createTransaction = async (req, res) => {
                 newBalanceOrig,
                 oldBalanceDest,
                 newBalanceDest,
+                kycStatus,
                 mlFraudProbability,
                 finalScore,
                 finalRiskLevel,
@@ -161,10 +165,7 @@ const createTransaction = async (req, res) => {
 const getTransactions = async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT t.*, u.kyc_status
-            FROM transactions t
-            JOIN users u ON t.user_id = u.id
-            ORDER BY t.created_at DESC`
+            "SELECT * FROM transactions ORDER BY created_at DESC"
         );
 
         res.json(result.rows);

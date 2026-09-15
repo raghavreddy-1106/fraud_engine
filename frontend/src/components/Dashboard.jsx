@@ -21,7 +21,9 @@ function Dashboard() {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to load transactions");
+          throw new Error(
+            data.message || "Failed to load transactions"
+          );
         }
 
         return data;
@@ -151,12 +153,13 @@ function Dashboard() {
                 <td>
                   <span
                     className={`kyc ${
-                      transaction.kyc_status
-                        ? transaction.kyc_status.toLowerCase()
+                      transaction.transaction_kyc_status
+                        ? transaction.transaction_kyc_status.toLowerCase()
                         : "pending"
                     }`}
                   >
-                    {transaction.kyc_status || "PENDING"}
+                    {transaction.transaction_kyc_status ||
+                      "PENDING"}
                   </span>
                 </td>
 
@@ -164,7 +167,9 @@ function Dashboard() {
 
                 <td>
                   <span
-                    className={`risk ${transaction.risk_level.toLowerCase()}`}
+                    className={`risk ${
+                      transaction.risk_level.toLowerCase()
+                    }`}
                   >
                     {transaction.risk_level}
                   </span>
@@ -172,14 +177,17 @@ function Dashboard() {
 
                 <td>
                   <span
-                    className={`status ${transaction.status.toLowerCase()}`}
+                    className={`status ${
+                      transaction.status.toLowerCase()
+                    }`}
                   >
                     {transaction.status}
                   </span>
                 </td>
 
                 <td className="reason">
-                  {transaction.reason || "Normal transaction"}
+                  {transaction.reason ||
+                    "Normal transaction"}
                 </td>
               </tr>
             ))}

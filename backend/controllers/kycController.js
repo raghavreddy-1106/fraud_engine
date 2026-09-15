@@ -148,7 +148,41 @@ const uploadKyc = async (req, res) => {
     }
 };
 
+const getKycStatus = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const result = await pool.query(
+            `SELECT
+                id,
+                kyc_status,
+                kyc_document_type,
+                kyc_verified_at
+             FROM users
+             WHERE id = $1`,
+            [userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json(result.rows[0]);
+
+    } catch (error) {
+        console.error("KYC status error:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch KYC status",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     upload,
-    uploadKyc
+    uploadKyc,
+    getKycStatus
 };
