@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const testRoutes = require("./routes/testRoutes");
-
+const pool = require("./config/db");
 
 const app = express();
 
@@ -26,6 +26,13 @@ app.get("/api/health", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
+pool.query("SELECT NOW()", (err, result) => {
+    if (err) {
+        console.error("Database connection failed:", err.message);
+    } else {
+        console.log("Database connected:", result.rows[0]);
+    }
+});
 app.listen(PORT, () => {
     console.log(`Backend running on port ${PORT}`);
 });
